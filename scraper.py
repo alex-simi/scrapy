@@ -53,7 +53,6 @@ class Scraper(scrapy.Spider):
     }
     start_urls = x_start_urls
     processed_product_set_url = "variable_initialization"
-    print('processed_product_set_url1', processed_product_set_url)
 
     def start_requests(self):
         for url in self.start_urls:
@@ -102,21 +101,13 @@ class Scraper(scrapy.Spider):
                 yield response.follow(next_page_peak, self.parse_product, 'GET',
                                         headers={'Authorization': basic_auth, 'X-CACHE-UPDATER': x_cache_updater_val_all})
         for product_set_filter in response.xpath('//ul[@facet-name="Product Set"]/li/input/@checked').extract():
-            print('Test 34 Condition ', x_run_peak_ai_components, response.url, product_set_filter)
             if (x_run_peak_ai_components == "yes") and (response.url != "(.*)\/s\/(.*)_(.*)") and (product_set_filter == "checked"):
-                print('Filter condition true. response.url:' , response.url)
                 product_set_url = response.url
-                print('processed_product_set_url2 ', self.processed_product_set_url)
                 if product_set_url != self.processed_product_set_url:
-                    print('Compare condition true')
                     self.processed_product_set_url = product_set_url
-                    print('processed_product_set_url3 ', self.processed_product_set_url)
                     next_page_peak_filter = re.sub("(.*)\/s\/", peak_ai + "/s/", self.processed_product_set_url)
-                    print('next_page_peak_filter ', next_page_peak_filter)
                     yield response.follow(next_page_peak_filter, self.parse_product, 'GET',
-                                          headers={'Authorization': basic_auth, 'X-CACHE-UPDATER': x_cache_updater_val_all})
-                else:
-                    print('Condition false')             
+                                          headers={'Authorization': basic_auth, 'X-CACHE-UPDATER': x_cache_updater_val_all})            
         for next_page in response.xpath('//a[@class="icon-angle-right"]/@href').extract():
             print('Next Page:', next_page)
             yield response.follow(next_page, self.parse_subcategory, 'GET',
