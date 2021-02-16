@@ -10,6 +10,7 @@ RUN apk -U add \
         python-dev \
         bash \
         curl ca-certificates \
+    && pip install --upgrade pip \  
     && update-ca-certificates \
     && pip install scrapy \
     && rm -rf /var/cache/apk/*
